@@ -10,7 +10,7 @@ const BASE_DOWNLOAD_PATH = process.env.DOWNLOAD_PATH || './downloads';
 
 const accounts = [
     {
-        name: 'Waschbeckenmanufaktur',
+        name: 'Betonwaschbecken',
         host: 'imap.udag.de',
         port: 993,
         user: process.env.BETON_USER,
