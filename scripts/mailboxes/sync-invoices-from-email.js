@@ -40,10 +40,16 @@ async function processAccount(acc) {
     await client.connect();
 
     const folders = await client.list();
-    const targetFolder = folders.find(f => acc.folderPattern.test(f.name) || acc.folderPattern.test(f.path));
+    const targetFolder = folders.find(
+        f =>
+            acc.folderPattern.test(f.name) ||
+            acc.folderPattern.test(f.path)
+    );
 
     if (!targetFolder) {
-        console.warn(`[-] Folder matching pattern 'Rechnung ${yearYY}' for ${acc.name} not found.`);
+        console.warn(
+            `[-] Folder matching pattern 'Rechnung ${yearYY}' for ${acc.name} not found.`
+        );
         await client.logout();
         return;
     }
@@ -55,13 +61,40 @@ async function processAccount(acc) {
         for await (let message of client.fetch('1:*', { source: true })) {
             const parsed = await simpleParser(message.source);
 
+            // Use the email's date to determine Year / Month / Day
+            const emailDate = parsed.date;
+
+            if (!emailDate || isNaN(emailDate.getTime())) {
+                console.warn(
+                    `[-] Could not determine email date for a message in ${acc.name}. Skipping attachments.`
+                );
+                continue;
+            }
+
+            const year = String(emailDate.getFullYear());
+            // month name instead of 2 digits format
+            const month = emailDate.toLocaleString('en-US', { month: 'long' });
+            const day = String(emailDate.getDate()).padStart(2, '0');
+
             for (let att of parsed.attachments) {
-                if (att.filename && att.filename.toLowerCase().endsWith('.pdf')) {
-                    const saveDir = path.join(BASE_DOWNLOAD_PATH, acc.name);
+                if (
+                    att.filename &&
+                    att.filename.toLowerCase().endsWith('.pdf')
+                ) {
+                    const saveDir = path.join(
+                        BASE_DOWNLOAD_PATH,
+                        acc.name,
+                        year,
+                        month,
+                        day
+                    );
+
                     await fs.ensureDir(saveDir);
 
                     const filePath = path.join(saveDir, att.filename);
+
                     await fs.writeFile(filePath, att.content);
+
                     console.log(`[✓] Saved: ${filePath}`);
                 }
             }
@@ -78,9 +111,13 @@ async function run() {
         try {
             await processAccount(acc);
         } catch (err) {
-            console.error(`[!] Error processing ${acc.name}:`, err.message);
+            console.error(
+                `[!] Error processing ${acc.name}:`,
+                err.message
+            );
         }
     }
+
     console.log('[+] All accounts processed successfully.');
 }
 
