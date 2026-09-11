@@ -5,10 +5,10 @@ const path = require('path');
 const PDFDocument = require('pdfkit');
 const moment = require('moment');
 
-const CLIENT_ID = process.env.PAYPAL_CLIENT_ID;
-const SECRET = process.env.PAYPAL_SECRET;
+const CLIENT_ID = process.env.PAYPAL_CLIENT_ID_FRED;
+const SECRET = process.env.PAYPAL_SECRET_FRED;
 const DOWNLOAD_DIR = process.env.DOWNLOAD_PATH || './downloads';
-const PAYPAL_FOLDER = path.join(DOWNLOAD_DIR, 'PayPal');
+const PAYPAL_FOLDER = path.join(DOWNLOAD_DIR, 'PayPal/FredFeuer');
 
 // 1. Get the Bearer Token using Client Credentials
 async function getPayPalAccessToken() {
