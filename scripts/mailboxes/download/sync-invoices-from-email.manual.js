@@ -3,6 +3,7 @@ const { ImapFlow } = require('imapflow');
 const { simpleParser } = require('mailparser');
 const fs = require('fs-extra');
 const path = require('path');
+const db = require('../../infrastructure/database');
 
 // Dynamically extract last 2 digits of current year (e.g., 2026 -> "26")
 const yearYY = String(new Date().getFullYear()).slice(-2);
